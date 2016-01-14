@@ -1,25 +1,44 @@
-# AIzaSyBaPdoEdmstM0_h1dAcC-Nh22EHNpXiia8
-from geolocation.main import GoogleMaps
 import logging
 logging.captureWarnings(True)
 
-address = "BMSCE, Basavanagudi Bengaluru"
-google_maps = GoogleMaps(api_key='AIzaSyBaPdoEdmstM0_h1dAcC-Nh22EHNpXiia8')
+from geopy.geocoders import Nominatim
+from geopy.distance import vincenty
 
-location = google_maps.search(location=address) # sends search to Google Maps.
+geolocator = Nominatim(country_bias='India')
 
-print location.all() # returns all locations.
+student_address = geolocator.geocode("ITI Colony, Bangalore")
+loc1 = (student_address.latitude, student_address.longitude)
 
-my_location = location.first() # returns only first location.
-# for my_location in location.all():
-print my_location.city
-print my_location.route
-print my_location.formatted_address
-print my_location.postal_code
-print str(my_location.lat) + "," + str(my_location.lng)
-for administrative_area in my_location.administrative_area:
-    print("{}: {}".format(administrative_area.area_type, administrative_area.name))
+distances = []
+coll_dist = {}
+colleges = ['BMS College of Engineering',
+            'Dayanand Sagar',
+            'PES College',
+            'Cambridge College',
+            'REVA College',
+            'CMRIT',
+            'APS College',
+            'ACS College',
+            'Alliance university',
+            'AMC college'
+            ]
 
-print(my_location.country)
-print(my_location.country_shortcut)
-print "\n\n"
+#Amruta college, Cyrus Intec
+# college = "Don bosco institute of technology"
+# print geolocator.geocode(college + ", Bangalore")
+for college in colleges:
+    college_address = geolocator.geocode(college + ", Bangalore")
+    loc2 = college_address.latitude, college_address.longitude
+    distance = vincenty(loc1, loc2)
+    coll_dist.update({college:distance})
+    distances.append(distance)
+
+minimum = min(distances)
+
+print "College: ", coll_dist.keys()[coll_dist.values().index(minimum)]
+print "Distance: ", minimum
+
+# for k, v in coll_dist.iteritems():
+#     print k, v
+#     print "\n"
+print "------------------------\n\n"
